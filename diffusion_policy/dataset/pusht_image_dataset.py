@@ -60,7 +60,7 @@ class PushTImageDataset(BaseImageDataset):
     def get_normalizer(self, mode='limits', **kwargs):
         data = {
             'action': self.replay_buffer['action'],
-            'agent_pos': self.replay_buffer['state'][...,:2]
+            'agent_pos': self.replay_buffer['state'][...,:]
         }
         normalizer = LinearNormalizer()
         normalizer.fit(data=data, last_n_dims=1, mode=mode, **kwargs)
@@ -71,7 +71,7 @@ class PushTImageDataset(BaseImageDataset):
         return len(self.sampler)
 
     def _sample_to_data(self, sample):
-        agent_pos = sample['state'][:,:2].astype(np.float32) # (agent_posx2, block_posex3)
+        agent_pos = sample['state'][:,:].astype(np.float32) # (agent_posx2, block_posex3)
         image = np.moveaxis(sample['img'],-1,1)/255
 
         data = {
