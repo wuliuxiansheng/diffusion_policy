@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange, reduce
 from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
+from diffusers.schedulers.scheduling_ddim import DDIMScheduler
 
 from diffusion_policy.model.common.normalizer import LinearNormalizer
 from diffusion_policy.policy.base_image_policy import BaseImagePolicy
@@ -36,6 +37,7 @@ class DiffusionUnetHybridImagePolicy(BaseImagePolicy):
             cond_predict_scale=True,
             obs_encoder_group_norm=False,
             eval_fixed_crop=False,
+            num_DDIM_inference_steps=10,
             # parameters passed to step
             **kwargs):
         super().__init__()
@@ -145,6 +147,19 @@ class DiffusionUnetHybridImagePolicy(BaseImagePolicy):
             cond_predict_scale=cond_predict_scale
         )
 
+        # Create DDIM sampler
+        DDIM_noise_scheduler = DDIMScheduler(
+            num_train_timesteps=self.noise_scheduler.num_train_timesteps,
+            beta_start=self.noise_scheduler.beta_start,
+            beta_end=self.noise_scheduler.beta_end,
+            beta_schedule=self.noise_scheduler.beta_schedule,
+            clip_sample=self.noise_scheduler.clip_sample,
+            prediction_type=self.noise_scheduler.prediction_type,
+        )
+        DDIM_noise_scheduler.set_timesteps(num_DDIM_inference_steps)
+        self.DDIM_noise_scheduler = DDIM_noise_scheduler
+        self.num_DDIM_inference_steps = num_DDIM_inference_steps
+
         self.obs_encoder = obs_encoder
         self.model = model
         self.noise_scheduler = noise_scheduler
@@ -176,11 +191,17 @@ class DiffusionUnetHybridImagePolicy(BaseImagePolicy):
             condition_data, condition_mask,
             local_cond=None, global_cond=None,
             generator=None,
+            use_DDIM=False,
             # keyword arguments to scheduler.step
             **kwargs
             ):
         model = self.model
-        scheduler = self.noise_scheduler
+        if use_DDIM:
+            scheduler = self.DDIM_noise_scheduler
+            scheduler.set_timesteps(self.num_DDIM_inference_steps)
+        else:
+            scheduler = self.noise_scheduler
+            scheduler.set_timesteps(self.num_inference_steps)
 
         trajectory = torch.randn(
             size=condition_data.shape, 
@@ -212,7 +233,7 @@ class DiffusionUnetHybridImagePolicy(BaseImagePolicy):
         return trajectory
 
 
-    def predict_action(self, obs_dict: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+    def predict_action(self, obs_dict: Dict[str, torch.Tensor], use_DDIM=False) -> Dict[str, torch.Tensor]:
         """
         obs_dict: must include "obs" key
         result: must include "action" key
@@ -260,6 +281,7 @@ class DiffusionUnetHybridImagePolicy(BaseImagePolicy):
             cond_mask,
             local_cond=local_cond,
             global_cond=global_cond,
+            use_DDIM=use_DDIM,
             **self.kwargs)
         
         # unnormalize prediction
