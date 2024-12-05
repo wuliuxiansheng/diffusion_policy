@@ -146,6 +146,7 @@ class DiffusionUnetHybridImagePolicy(BaseImagePolicy):
             n_groups=n_groups,
             cond_predict_scale=cond_predict_scale
         )
+        self.noise_scheduler = noise_scheduler
 
         # Create DDIM sampler
         DDIM_noise_scheduler = DDIMScheduler(
@@ -162,7 +163,6 @@ class DiffusionUnetHybridImagePolicy(BaseImagePolicy):
 
         self.obs_encoder = obs_encoder
         self.model = model
-        self.noise_scheduler = noise_scheduler
         self.mask_generator = LowdimMaskGenerator(
             action_dim=action_dim,
             obs_dim=0 if obs_as_global_cond else obs_feature_dim,
