@@ -28,16 +28,16 @@ logging:
   group: null
   id: null
   mode: online
-  name: 2024.12.12-16.30.06_train_diffusion_unet_hybrid_pickup_dollar_image
+  name: 2025.02.11-15.30.06_train_diffusion_unet_hybrid_pickup_block_image
   project: diffusion_policy_debug
   resume: true
   tags:
   - train_diffusion_unet_hybrid
-  - pickup_dollar_image
+  - pickup_block_image
   - default
 multi_run:
-  run_dir: data/outputs/2024.12.12/16.30.06_train_diffusion_unet_hybrid_pickup_block_image
-  wandb_name_base: 2024.12.12-16.30.06_train_diffusion_unet_hybrid_pickup_block_image
+  run_dir: data/outputs/2025.02.11/15.30.06_train_diffusion_unet_hybrid_pickup_block_image
+  wandb_name_base: 2025.02.11-15.30.06_train_diffusion_unet_hybrid_pickup_block_image
 n_action_steps: 8
 n_latency_steps: 0
 n_obs_steps: 2
@@ -141,7 +141,7 @@ task:
   - 3
   - 240
   - 320
-  name: pickup_dollar_image
+  name: pickup_block_image
   shape_meta:
     action:
       shape:
@@ -167,7 +167,7 @@ training:
   lr_warmup_steps: 500
   max_train_steps: null
   max_val_steps: null
-  num_epochs: 400
+  num_epochs: 300
   resume: true
   rollout_every: 50
   sample_every: 5
