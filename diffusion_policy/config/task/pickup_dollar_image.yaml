@@ -4,7 +4,7 @@ checkpoint:
   save_last_snapshot: false
   topk:
     format_str: 'epoch={epoch:04d}-train_loss={train_loss:.3f}.ckpt'
-    k: 20
+    k: 10
     mode: min
     monitor_key: train_loss
 dataloader:
@@ -28,7 +28,7 @@ logging:
   group: null
   id: null
   mode: online
-  name: 2025.02.18-16.30.06_train_diffusion_unet_hybrid_pickup_dollar_image
+  name: 2025.03.06-14.30.06_train_diffusion_unet_hybrid_pickup_dollar_image
   project: diffusion_policy_debug
   resume: true
   tags:
@@ -36,8 +36,8 @@ logging:
   - pickup_dollar_image
   - default
 multi_run:
-  run_dir: data/outputs/2025.02.18/16.30.06_train_diffusion_unet_hybrid_pickup_dollar_image
-  wandb_name_base: 2025.02.18-16.30.06_train_diffusion_unet_hybrid_pickup_dollar_image
+  run_dir: data/outputs/2025.03.06/14.30.06_train_diffusion_unet_hybrid_pickup_dollar_image
+  wandb_name_base: 2025.03.06-14.30.06_train_diffusion_unet_hybrid_pickup_dollar_image
 n_action_steps: 8
 n_latency_steps: 0
 n_obs_steps: 2
@@ -159,7 +159,7 @@ task:
         type: rgb
 task_name: pickup_dollar_image
 training:
-  checkpoint_every: 20
+  checkpoint_every: 10
   debug: false
   device: cuda:0
   gradient_accumulate_every: 1
@@ -167,7 +167,7 @@ training:
   lr_warmup_steps: 500
   max_train_steps: null
   max_val_steps: null
-  num_epochs: 300
+  num_epochs: 200
   resume: true
   rollout_every: 50
   sample_every: 5
